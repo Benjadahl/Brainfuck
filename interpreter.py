@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
+import time
+start_time = time.time()
+
 import sys
 from bidict import bidict
+
 
 f = open(sys.argv[1], "r")
 rawData = f.read()
@@ -59,4 +63,4 @@ while (cPointer < len(rawData)):
 
     cPointer += 1
 
-
+print("--- %s seconds ---" % (time.time() - start_time))
