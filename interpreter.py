@@ -1,46 +1,34 @@
 #!/usr/bin/env python
 
 import sys
+from bidict import bidict
 
 f = open(sys.argv[1], "r")
 rawData = f.read()
 f.close()
 
 
-loopStarts = {}
-loopEnds = {}
 
-i = 0
+brackets = []
+loopStarts = bidict({})
 
-loopStart = 0
-depth = 0
+i=0
 
 while (i < len(rawData)):
     ic = rawData[i]
-
-    print("d: " + str(depth) + " i: " + str(i) + " c: " + ic)
-
+    
     if (ic == "["):
-        depth += 1
-        
-        if (depth == 0):
-            loopStart = i
-
+        brackets.append({"b": "[", "i": i})
 
     elif (ic == "]"):
-        depth -= 1
 
-        if (depth == 0):
-            loopStarts[loopStart] = i
-            i = loopStart
-            
+        if (brackets[-1]["b"] == "["):
+            loopStarts[brackets[-1]["i"]] = i
+            brackets.pop()
+        else:  
+            brackets.append({"b": "]", "i": i})
 
-    
     i += 1
-    
-print(loopStarts)
-
-
 
 cells = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 dPointer = 0
@@ -48,8 +36,8 @@ cPointer = 0
 
 while (cPointer < len(rawData)):
     c = rawData[cPointer]
+    cell = cells[dPointer]
 
-    print(c)
     if (c == ">"):
         dPointer += 1
     elif (c == "<"):
@@ -59,19 +47,16 @@ while (cPointer < len(rawData)):
     elif (c == "-"):
         cells[dPointer] -= 1
     elif (c == "."):
-        print(cells[dPointer])
+        print(chr(cell))
     elif (c == ","):
         cells[dPointer] = input()
     elif (c == "["):
-        print(c)
+        if (cell == 0):
+            cPointer = loopStarts[cPointer]
     elif (c == "]"):
-        print(c)
+        if (cell != 0):
+            cPointer = loopStarts.inverse[cPointer]
 
     cPointer += 1
-
-    
-
-print(cells)
-
 
 
